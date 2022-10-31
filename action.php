@@ -16,17 +16,15 @@ if(isset($_POST['pid']))
 
 	$total_price = $pprice * $pqty;
 
-	$stmt = $conn->query("SELECT * FROM cart WHERE product_code = $pcode");
-	$r = $stmt->fetch_assoc();
-	$result = $r['product_code'];
-	// $stmt->execute();
-	//$res = $stmt->get_result();
-	// $r = $stmt->fetch_assoc();
-	// $code =$r['product_code'];
-	$output = $result;
-	echo json_encode($output['cartRes']);
+	
+	$stmt = $conn->prepare('SELECT product_code FROM cart WHERE product_code = ?');
+	$stmt->bind_param('s',$pcode);
+	$stmt->execute();
+	$res = $stmt->get_result();
+	$r = $res->fetch_assoc();
+	$code = $r['product_code'];
 
-	if(!$result)
+	if(!$code)
 	{
 		$query = $conn->prepare('INSERT INTO cart(product_name,product_price,product_image,qty,total_price,product_code) VALUES(?,?,?,?,?,?)');
 		$query->bind_param('ssssss',$pname,$pprice,$pimage,$pqty,$total_price,$pcode);
